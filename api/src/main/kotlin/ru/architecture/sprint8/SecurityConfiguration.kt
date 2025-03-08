@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.reactive.CorsConfigurationSource
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 
 @Configuration
 class SecurityConfiguration {
@@ -19,11 +22,25 @@ class SecurityConfiguration {
                 exchanges
                     .pathMatchers("/reports")
                     .authenticated()
-                    //.hasRole("prothetic_user")
             }
             .oauth2ResourceServer { oauth2 ->
                 oauth2.opaqueToken(Customizer.withDefaults())
             }
             .build()
     }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration().apply {
+            allowCredentials = true
+            allowedHeaders = listOf(CorsConfiguration.ALL)
+            allowedMethods = listOf(CorsConfiguration.ALL)
+            allowedOrigins = listOf("http://localhost:3000")
+        }
+        val source = UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", configuration)
+        }
+        return source
+    }
+
 }
